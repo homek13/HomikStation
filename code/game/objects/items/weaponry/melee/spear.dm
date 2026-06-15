@@ -181,11 +181,30 @@
 		take_damage(force / 2, sound_effect = FALSE)
 
 /obj/item/spear/throw_impact(atom/hit_atom, datum/thrownthing/throwingdatum)
+	icon_angle = initial(icon_angle)
 	. = ..()
 	if (.) //spear was caught
 		return
 	if(improvised_construction && !QDELETED(src))
 		take_damage(throwforce / 2, sound_effect = FALSE)
+
+/obj/item/spear/throw_at(atom/target, range, speed, mob/thrower, spin, diagonals_first, datum/callback/callback, quickstart, params)
+	if(thrower && target)
+		var/dx = target.x - thrower.x
+		var/dy = target.y - thrower.y
+		if(dx || dy)
+			icon_angle = round(arctan(dy, dx)) - 45
+			transform = turn(matrix(), icon_angle)
+	. = ..(target, range, speed, thrower, FALSE, diagonals_first, callback)
+
+/obj/item/spear/New(loc, ...)
+	. = ..()
+	dir = 5
+
+/obj/item/spear/pickup(mob/user)
+	. = ..()
+	icon_angle = initial(icon_angle)
+	dir = 5
 
 /obj/item/spear/atom_destruction(damage_flag)
 	playsound(src, 'sound/effects/grillehit.ogg', 50)
