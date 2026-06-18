@@ -30,12 +30,14 @@ export function PageMain(props) {
     shuttleCanEvacOrFailReason,
     shuttleLastCalled,
     shuttleRecallable,
+    canRequestERT,
   } = data;
 
   const [callingShuttle, setCallingShuttle] = useState(false);
   const [messagingAssociates, setMessagingAssociates] = useState(false);
   const [messagingSector, setMessagingSector] = useState('');
   const [requestingNukeCodes, setRequestingNukeCodes] = useState(false);
+  const [requestingERT, setRequestingERT] = useState(false);
 
   const [newAlertLevel, setNewAlertLevel] = useState('');
   const showAlertLevelConfirm = newAlertLevel && newAlertLevel !== alertLevel;
@@ -188,6 +190,16 @@ export function PageMain(props) {
             </Button>
           )}
 
+          {!!canRequestERT && (
+            <Button
+              icon="people-group"
+              disabled={!importantActionReady}
+              onClick={() => setRequestingERT(true)}
+            >
+              Request Emergency Response Team
+            </Button>
+          )}
+
           {!!emagged && !syndicate && (
             <Button icon="undo" onClick={() => act('restoreBackupRoutingData')}>
               Restore Backup Routing Data
@@ -224,6 +236,22 @@ export function PageMain(props) {
           onSubmit={(reason) => {
             setRequestingNukeCodes(false);
             act('requestNukeCodes', {
+              reason,
+            });
+          }}
+        />
+      )}
+
+      {!!canRequestERT && requestingERT && (
+        <MessageModal
+          label="Reason for requesting Emergency Response Team"
+          notice="Misuse of the ERT system will not be tolerated under any circumstances. Transmission does not guarantee a response."
+          icon="people-group"
+          buttonText="Request ERT"
+          onBack={() => setRequestingERT(false)}
+          onSubmit={(reason) => {
+            setRequestingERT(false);
+            act('requestERT', {
               reason,
             });
           }}
